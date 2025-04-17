@@ -1,0 +1,15 @@
+[Unit]
+Description=LanSend Python P2P Service
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/opt/LanSend/service
+WorkingDirectory=/opt/LanSend/
+Environment="DISPLAY=:0"
+Environment="DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus"
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=default.target

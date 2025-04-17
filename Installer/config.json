@@ -1,0 +1,6 @@
+{
+    "historypath": "/var/log/LanSend/history.log",
+    "receiveport": 8000,
+    "connections": [
+    ]
+}
