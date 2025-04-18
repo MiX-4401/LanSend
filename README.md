@@ -7,6 +7,8 @@ Created by MiX-4401
  > Lightweight and highly distributive
  > Direct messaging (unencrypted)
  > Boradcast messaging (unencrypted)
+ > IP Blacklisting
+ > Service managing
 
 *Installation
  1) Download ./Installer

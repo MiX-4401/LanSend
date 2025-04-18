@@ -4,23 +4,8 @@ install -Dm644 "./lansend.service" "/usr/lib/systemd/user/lansend.service"
 install -Dm666 "./history.log" "/var/log/LanSend/history.log"
 install -Dm666 "./config.json" "/etc/LanSend/config.json"
 
-mkdir -p "/usr/local/bin/"
-cp "./lansend" "/usr/local/bin/"
-
-mkdir -p "/opt/LanSend/"
-cp  "./service" "/opt/LanSend/"
-
-mkdir -p "/usr/lib/systemd/user/"
-cp "./lansend.service" "/usr/lib/systemd/user/lansend.service"
-
-mkdir -p "/var/log/LanSend/"
-cp "./history.log" "/var/log/LanSend/history.log"
-
-mkdir -p "/etc/LanSend"
-cp "./config.json" "/etc/LanSend/config.json"
-
 echo "Please run the following commands"
 echo "systemctl --user daemon-reload"
 echo "systemctl --user enable lansend"
 echo "systemctl --user start lansend"
-echo "LanSend installed and started!"
+echo "LanSend files installed!"
