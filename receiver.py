@@ -11,6 +11,9 @@ class Receiver:
         "historypath": "/var/log/history.log", 
         "receiveport": 8000, 
         "connections": [
+        ],
+        "blacklist": [
+
         ]
     }
 
@@ -19,6 +22,7 @@ class Receiver:
         self.rPort: int
         self.connections: int
         self.historyPath: str
+        self.blacklist:   list
 
     def loadConfig(self) -> None:
         try:
@@ -29,6 +33,7 @@ class Receiver:
         self.rPort = data["receiveport"]
         self.connections = data["connections"]
         self.historyPath = data["historypath"]
+        self.blacklist   = data["blacklist"]
 
     def loadSocket(self) -> None:
         self.rSocket = soc.socket(soc.AF_INET, soc.SOCK_STREAM)
@@ -74,16 +79,23 @@ class Receiver:
         self.loadConfig()
         self.loadSocket()
 
-        print(f"Server listening @{self.rPort}")
+        print(f"Listening on port: {self.rPort}")
 
         # Main-Loop for creating socket receiver workers
         self.rSocket.listen()
         while True:
+
+            # Get machine information
             conn, addr = self.rSocket.accept()
             machinename = self.findHostByIP(addr[0])
 
+            # Check blacklist
+            if addr[0] in self.blacklist: 
+                print(f"Stopped connection with {addr} due to Blacklist")
+                continue
+
+            # Get message content
             print(f"Connected to: ({addr}, {machinename})")
-            
             self.createWorker(conn, addr, machinename)
 
 

@@ -2,6 +2,7 @@ from typing        import Union, NewType
 from json          import dump
 from _scripts.misc import read_json
 from sender        import Sender
+import sys        as sys
 import subprocess as sub
 import click      as cli
 
@@ -19,6 +20,10 @@ def myCli(ctx):
         "historypath": "/var/log/history.log", 
         "receiveport": 8000, 
         "connections": [
+            
+        ],
+        "blacklist": [
+            
         ]
     }
 
@@ -32,24 +37,30 @@ def myCli(ctx):
 
 @myCli.command("send")
 @cli.argument("host")
-@cli.argument("msg")
+@cli.argument("msg", required=False)
 @cli.pass_context
 def CLISend(ctx, host:Union[IP,HOSTNAME], msg:str) -> None:
     """Send to specific machine"""
 
+    if not sys.stdin.isatty():
+        msg = sys.stdin.read()
+
     ctx.obj["sender"].send(host=host, msg=msg)
 
 @myCli.command("broadcast")
-@cli.argument("msg")
+@cli.argument("msg", required=False)
 @cli.pass_context
 def CLIBroadcast(ctx, msg:str) -> None:
     """Send to ALL machines"""
     
+    if not sys.stdin.isatty():
+        msg = sys.stdin.read()
+
     ctx.obj["sender"].broadcast(msg=msg)
 
 @myCli.command("history")
 @cli.option("-a", "--all",     default=False, is_flag=True, type=bool, help="number of messages")
-@cli.option("-c", "--count",   default=1,    type=int, help="number of messages")
+@cli.option("-c", "--count",   default=10,    type=int, help="number of messages")
 @cli.pass_context
 def CLIHistory(ctx, all:bool, count:int) -> None:
     """Get received message history"""
@@ -75,26 +86,42 @@ def CLIHistory(ctx, all:bool, count:int) -> None:
 @cli.option("-r", "--remove-machine", nargs=1, metavar="NAME")
 @cli.option("-s", "--show-machines",  is_flag=True)
 @cli.option("-p", "--default-port",   nargs=1, metavar="PORT")
+@cli.option("-A", "--blacklist-machine",  nargs=1, metavar="IP")
+@cli.option("-R", "--whitelist-machine", nargs=1, metavar="IP")
+@cli.option("-S", "--show-blacklist", is_flag=True)
 @cli.pass_context
-def CLIConfig(ctx, add_machine, remove_machine, show_machines, default_port) -> None:
+def CLIConfig(ctx, add_machine, remove_machine, show_machines, blacklist_machine, whitelist_machine, show_blacklist, default_port) -> None:
     """Modify the LanSend configs"""
 
     if add_machine:
         ip, machinename = add_machine
         ctx.obj["config"]["connections"].append({"machinename": machinename, "ip": ip})
-    elif remove_machine:
+    if remove_machine:
         machinename = remove_machine
         for i,x in enumerate(ctx.obj["config"]["connections"]):
             if x["machinename"] != machinename: continue
             ctx.obj["config"]["connections"].pop(i)
-    elif show_machines:
+    if show_machines:
         for x in ctx.obj["config"]["connections"]:
             ip:          str = x["ip"]
             machinename: str = x["machinename"]
             
             cli.echo(f"IP: {ip}")
             cli.echo(f"MACHINENAME: {machinename}")
-    elif default_port:
+    if blacklist_machine:
+        cli.echo(f"{blacklist_machine} has been blacklisted")
+        ctx.obj["config"]["blacklist"].append(blacklist_machine)
+    if whitelist_machine:
+        if whitelist_machine not in ctx.obj["config"]["blacklist"]: 
+            cli.echo(f"{whitelist_machine} is not blacklisted")
+        else:            
+            ctx.obj["config"]["blacklist"].remove(whitelist_machine)
+    if show_blacklist:
+        for x in ctx.obj["config"]["blacklist"]:
+            ip: str = x
+            
+            cli.echo(f"IP: {ip}")
+    if default_port:
         ctx.obj["config"]["receiveport"] = default_port
         
     with open("/etc/LanSend/config.json", "w") as f:

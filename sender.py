@@ -12,6 +12,10 @@ class Sender:
         "historypath": "/var/log/history.log", 
         "receiveport": 8000, 
         "connections": [
+
+        ],
+        "blacklist": [
+            
         ]
     }
 
