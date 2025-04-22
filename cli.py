@@ -58,6 +58,23 @@ def CLIBroadcast(ctx, msg:str) -> None:
 
     ctx.obj["sender"].broadcast(msg=msg)
 
+@myCli.command("ping")
+@cli.argument("host", required=False)
+@cli.option("-a", "--all",           default=False, is_flag=True)
+@cli.option("-s", "--check-service", default=True, is_flag=True)
+@cli.option("-o", "--check-online",  default=False, is_flag=True)
+@cli.pass_context
+def CLIPing(ctx, host:Union[IP,HOSTNAME], all:bool, check_service:bool, check_online:bool) -> None:
+    """Ping machines for service status"""
+
+    if all:
+        ctx.obj["sender"].pingAll()
+        return
+
+    ctx.obj["sender"].ping(host)
+
+
+
 @myCli.command("history")
 @cli.option("-a", "--all",     default=False, is_flag=True, type=bool, help="number of messages")
 @cli.option("-c", "--count",   default=10,    type=int, help="number of messages")
