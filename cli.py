@@ -60,11 +60,9 @@ def CLIBroadcast(ctx, msg:str) -> None:
 
 @myCli.command("ping")
 @cli.argument("host", required=False)
-@cli.option("-a", "--all",           default=False, is_flag=True)
-@cli.option("-s", "--check-service", default=True, is_flag=True)
-@cli.option("-o", "--check-online",  default=False, is_flag=True)
+@cli.option("-a", "--all", default=False, is_flag=True)
 @cli.pass_context
-def CLIPing(ctx, host:Union[IP,HOSTNAME], all:bool, check_service:bool, check_online:bool) -> None:
+def CLIPing(ctx, host:Union[IP,HOSTNAME], all:bool) -> None:
     """Ping machines for service status"""
 
     if all:

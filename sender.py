@@ -59,10 +59,6 @@ class Sender:
         except Exception as e:
             if not silent: print(f"Could not connect to {ip}: {e}")
             return False
-        
-    # def checkOnline(self, ip:str) -> None:
-    #     result = sub.run(["ping", ip], capture_output=True)
-    #     return result
 
     def broadcast(self, msg:str):
         for machine in self.connections:
@@ -75,7 +71,7 @@ class Sender:
         self.sSocket.close()
 
     def send(self, msg:str, host:Union[IP,HOSTNAME]):
-        if not "." in host: ip: str = self.findHostByName(host)
+        if not "." in host: ip: str = self.findIpByName(host)
         else: ip = host
         result = self.establishConnection(ip)
         if not result: return
